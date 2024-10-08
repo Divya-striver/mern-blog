@@ -10,7 +10,8 @@ export const updateUser = async (req, res, next) => {
     return next(errorHandler(403, 'you are not allowed to update this user'));
   }
   if (req.body.password){
-    if(req.body.password.length < 6){
+    if(req.body.password.length < 6){ 
+        
       return next(errorHandler(400, 'password must be atleast 6 characters'));
     }
     req.body.password = bcryptjs.hashSync(req.body.password, 10);
