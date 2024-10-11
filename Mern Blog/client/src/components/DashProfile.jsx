@@ -8,9 +8,10 @@ import 'react-circular-progressbar/dist/styles.css';
 import { updateStart, updateSuccess,updateFailure,deleteUserStart,deleteUserSuccess,deleteUserFailure,signoutSuccess, } from '../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import { Link } from 'react-router-dom';
 
 export default function DashProfile() {
-    const {currentUser, error} = useSelector((state) => state.user);
+    const {currentUser, error, loading } = useSelector((state) => state.user);
     const [imageFile, setImageFile] = useState(null);
     const [imageFileUrl, setImageFileUrl] = useState(null);
     const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
@@ -70,7 +71,7 @@ export default function DashProfile() {
         () => {
             getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
               setImageFileUrl(downloadURL);
-              setFormData({ ...formData, profilePicture:downloadURL });
+              setFormData({ ...formData, profilePicture: downloadURL });
               setImageFileUploading(false);
          });
         }   
@@ -78,7 +79,7 @@ export default function DashProfile() {
     };
 
     const handleChange = (e) => {
-      setFormData({ ...formData, [e.target.id] : e.target.value });
+      setFormData({ ...formData, [e.target.id]: e.target.value });
     };
 
     const handleSubmit = async (e) => {
@@ -89,13 +90,13 @@ export default function DashProfile() {
         setUpdateUserError('No changes made');
         return;
       }
-      if(imageFileUploading){
+      if (imageFileUploading){
         setUpdateUserError('please wait for image to upload');
         return;
       }
-      try{
-        dispatch(updateStart());
-        const res = await fetch('/api/user/update/${currentUser._id}',{
+      try {
+        dispatch(updateStart());     
+        const res = await fetch(`/api/user/update/${currentUser._id}`,{
           method: 'PUT',
           headers: {
              'Content-Type': 'application/json',
@@ -120,7 +121,7 @@ export default function DashProfile() {
       setShowModal(false);
       try{
          dispatch(deleteUserStart());
-         const res = await fetch('/api/user/delete/${currentUser._id}', {
+         const res = await fetch(`/api/user/delete/${currentUser._id}`, {
           method: 'DELETE',
          });
          const data = await res.json();
@@ -209,9 +210,22 @@ export default function DashProfile() {
           placeholder='password'
           onChange={handleChange}
         />
-         <Button type='submit' gradientDuoTone='purpleToBlue' outline>
-            Update
+         <Button type='submit' gradientDuoTone='purpleToBlue' outline disabled={loading || imageFileUploading}>
+            {loading ? 'Loading...' : 'Update'}
          </Button>
+         {
+          currentUser.isAdmin && (
+            <Link to={'/create-post'}>
+               <Button
+              type='button'
+              gradientDuoTone='purpleToPink'
+              className='w-full'
+              >
+                Create a post 
+              </Button>
+            </Link>
+          )
+         }
      </form>
      <div className="text-red-500 flex justify-between mt-5">
          <span onClick={()=>setShowModal(true)} className='cursor-pointer'>Delete Account</span>
