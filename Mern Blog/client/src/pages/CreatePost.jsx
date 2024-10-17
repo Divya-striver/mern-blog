@@ -66,7 +66,7 @@ export default function CreatePost() {
       const data = await res.json();
       if(!res.ok){
         setPublishError(data.message)
-        return
+        return;
       }
     
       if(res.ok){
@@ -78,6 +78,7 @@ export default function CreatePost() {
       setPublishError('something went wrong');
     }
   };
+  
   return (
      <div className='p-3 max-w-3xl mx-auto min-h-screen'>
     <h1 className='text-center text-3xl my-7 font-semibold'>Create a post</h1>
